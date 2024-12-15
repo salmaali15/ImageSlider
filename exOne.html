@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+ <div id="slider">
+   <img id="sliderImage" src="" alt="Image Slider" width="600" height="600">
+   <div id="sliderText"></div>
+ </div>
+ <div id="controls">
+   <button id="previous">&lt;&lt;</button>
+   <button id="play">Play</button>
+   <button id="stop">Stop</button>
+   <button id="next">&gt;&gt;</button>
+   <button id="speed1x">1x 6s</button>
+   <button id="speed2x">2x 4s</button>
+   <button id="speed3x">3x 2s</button>
+ </div>
+ <script>
+    const sliderImage = document.getElementById("sliderImage");
+const sliderText = document.getElementById("sliderText");
+const playButton = document.getElementById("play");
+const stopButton = document.getElementById("stop");
+const nextButton = document.getElementById("next");
+const previousButton = document.getElementById("previous");
+const speed1xButton = document.getElementById("speed1x");
+const speed2xButton = document.getElementById("speed2x");
+const speed3xButton = document.getElementById("speed3x");
+
+let images = [];
+let currentIndex = 0;
+let interval = null;
+let intervalTime = 6000;
+
+// Fetch images using XMLHttpRequest
+function fetchImages() {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", "https://jsonplaceholder.typicode.com/albums/1/photos", true);
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      images = JSON.parse(xhr.responseText);
+      if (images.length > 0) {
+        updateSlider();
+      }
+    }
+  };
+  xhr.send();
+}
+
+// Update slider with current image and text
+function updateSlider() {
+  if (images.length > 0) {
+    sliderImage.src = images[currentIndex].url;
+    sliderText.textContent = images[currentIndex].title;
+  }
+}
+
+// Show next image
+function nextImage() {
+  currentIndex = (currentIndex + 1) % images.length;
+  updateSlider();
+}
+
+// Show previous image
+function previousImage() {
+  currentIndex = (currentIndex - 1 + images.length) % images.length;
+  updateSlider();
+}
+
+// Start autoplay
+function startAutoplay() {
+  if (!interval) {
+    interval = setInterval(nextImage, intervalTime);
+  }
+}
+
+// Stop autoplay
+function stopAutoplay() {
+  clearInterval(interval);
+  interval = null;
+}
+
+// Change speed
+function changeSpeed(time) {
+  intervalTime = time;
+  if (interval) {
+    stopAutoplay();
+    startAutoplay();
+  }
+}
+
+// Event listeners
+playButton.addEventListener("click", startAutoplay);
+stopButton.addEventListener("click", stopAutoplay);
+nextButton.addEventListener("click", nextImage);
+previousButton.addEventListener("click", previousImage);
+speed1xButton.addEventListener("click", () => changeSpeed(6000));
+speed2xButton.addEventListener("click", () => changeSpeed(4000));
+speed3xButton.addEventListener("click", () => changeSpeed(2000));
+
+// Initialize slider
+fetchImages();
+ </script>
+ <script src="./cookieLibrary.js"></script>
+</body>
+</html>
